@@ -23,7 +23,7 @@ bool isClearing = false;
 Font font;
 vector<vector<int>> mat;
 UIutils ui;
-
+vector<string> encapsulate = {"{}", "[]"};
 void generateMat();
 string toStr(int val);
 int toInt(string str);
@@ -45,7 +45,7 @@ int main()
     ui.addButton(vec2(512, 130), vec2(100, 80), outputMatToFile, "save \nMat");
     ui.addDropDown(vec2(512, 210), vec2(100, 50), choices, 5, "width");
     ui.addDropDown(vec2(512, 260), vec2(100, 50), choices, 5, "height");
-
+    ui.addDropDown(vec2(512, 310), vec2(100, 50), encapsulate, 2, "surround mat");
     while(window.isOpen())
     {
         while(window.pollEvent(e))
@@ -73,14 +73,13 @@ int main()
         if(mat.size() > 0)
         {
             float ratioSize = min({512 / mat.size(), 512 / mat[0].size()});
-            vec2 matPos = vec2(floor(clamp(Mouse::getPosition(window).x / ratioSize, 0, mat[0]w.size())),
+            vec2 matPos = vec2(floor(clamp(Mouse::getPosition(window).x / ratioSize, 0, mat[0].size())),
                                floor(clamp(Mouse::getPosition(window).y / ratioSize, 0, mat.size())));
             mat[matPos.y][matPos.x] = isDrawing ? 1 : isClearing ? 0 : mat[matPos.y][matPos.x];
             for(int i = 0; i < mat.size(); i++)
             {
                 for(int j = 0; j < mat[i].size(); j++)
                 {
-
                     VertexArray line(LineStrip, 2);
                     line[0].color = Color::White;
                     line[1].color = Color::White;
@@ -129,45 +128,45 @@ float clamp(float v, float minv, float maxv)
 
 void outputMat()
 {
-    cout << "\nvector<vector<int>> mat = {" << endl;
+    cout << "\nvector<vector<int>> mat = " << ui.dropDowns[2].value[0] << endl;
     for(int i = 0; i < mat.size(); i++)
     {
-        cout << "{";
+        cout << ui.dropDowns[2].value[0];
         for(int j = 0; j < mat[i].size(); j++)
         {
             cout << toStr(mat[i][j]);
             if(j < mat[i].size() - 1)
                 cout << ",";
         }
-        cout << "}";
+        cout << ui.dropDowns[2].value[1];
         if(i < mat.size() - 1)
             cout << ",";
         cout << endl;
     }
-    cout << "};";
+    cout << ui.dropDowns[2].value[1] << ";";
 }
 
 void outputMatToFile()
 {
     ifstream f("out.txt");
     fstream file;
-    file.open("out.txt", ios::out);
-    file << "vector<vector<int>> mat = {" << endl;
+    file.open("out.txt");
+    file << "vector<vector<int>> mat = " << ui.dropDowns[2].value[0] << endl;
     for(int i = 0; i < mat.size(); i++)
     {
-        file << "{";
+        file << ui.dropDowns[2].value[0];
         for(int j = 0; j < mat[i].size(); j++)
         {
             file << toStr(mat[i][j]);
             if(j < mat[i].size() - 1)
                 file << ",";
         }
-        file << "}";
+        file << ui.dropDowns[2].value[1];
         if(i < mat.size() - 1)
             file << ",";
         file << endl;
     }
-    file << "};";
+    file << ui.dropDowns[2].value[1] << ";";
     file.close();
     cout << "Saved matrix to file successfully\n";
     return;
